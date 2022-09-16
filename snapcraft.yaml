@@ -1,0 +1,34 @@
+name: ifacetool
+summary: tooling to work with snap interfaces
+description: |
+  ifacetool...
+base: core20
+grade: devel
+confinement: strict
+adopt-info: ifacetool
+
+apps:
+  ifacetool:
+     command: bin/ifacetool
+     plugs: [password-manager-service, home, network]
+
+parts:
+  ifacetool:
+    plugin: python
+    source: .
+    override-pull: |
+      snapcraftctl pull
+      snapcraftctl set-version "$(cat VERSION)-$(cat SNAPD_VERSION)"
+
+  engine:
+    plugin: nil
+    source: .
+    build-snaps:
+      - go/1.13/stable
+    override-build: |
+      go build -o ifacetool-engine ./engine
+      mkdir $SNAPCRAFT_PART_INSTALL/bin
+      cp -a ifacetool-engine $SNAPCRAFT_PART_INSTALL/bin/ifacetool-engine
+    prime:
+      - bin/ifacetool-engine
+

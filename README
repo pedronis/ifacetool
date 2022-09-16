@@ -1,0 +1,15 @@
+WIP
+
+fetch [--decl-only] snap-name[=rev] ...
+auto-connections target-snap [context snaps]
+
+Ideas
+======
+can-install snap
+can-connect snap-plug snap-slot
+allow-installation slot-or-plug
+allow-auto-connection plugs and/or slot
+allow-connection plug and/or slot
+explain snap-name
+explain/lint snap-name
+[attr matching code]
