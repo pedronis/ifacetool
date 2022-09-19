@@ -1,7 +1,52 @@
-WIP
+ifacetool provides tooling to work with snap interfaces, in
+particular their policies as realized via snap-declarations
 
-fetch [--decl-only] snap-name[=rev] ...
-auto-connections target-snap [context snaps]
+One central feature of ifacetool is simulating what snapd will
+do in terms of auto-connections for a group of snaps given snap
+metadata and snap-declaration content.
+
+Commands
+=========
+
+fetch
+------
+
+fetch [--no-decls] [--no-meta] <snap-name>[@rev]...
+
+fetch fetches snap metadata (at the given optional revisions) and snap
+declaration content for a set of snaps.
+
+For each snap it creates directories in the current working dir that
+look like this:
+
+<snap-name>/
+  .snap.json
+  revision
+  snap.yaml
+  plugs.json
+  slots.json
+
+snap.yaml is the snap metadata, while plugs/slots.json are the content
+of the snap declaration interface rule stanzas.
+
+These directories named after the snaps are the input for all other
+commands, they also allow to apply tentative modifications to the
+metadata or the snap-declaration rules to test.
+
+auto-connections
+-----------------
+
+auto-connections [--store <store-id>] [--model <brand>/<model>] <target-snap> [c<context snap>..]
+
+auto-connections using the input from the corresponding snap directories (see fetch) does two things:
+
+* checks whether all snaps mentioned on the command line can be installed
+  according to the rules
+* simulates which auto-connections would be established when installing
+  target-snap, assuming the presence of the listed context snaps
+
+--store and --model values are used when processing on-store/on-model/on-brand
+constraints in the rules.
 
 Ideas
 ======

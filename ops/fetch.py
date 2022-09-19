@@ -46,17 +46,21 @@ class Fetcher:
             "GET",
             f"https://dashboard.snapcraft.io/api/v2/snaps/{name}/revisions/{revno}?include-yaml=1",
         )
-        return rsp.json()["revision"]["snap-yaml"]
+        rev_data = rsp.json()["revision"]
+        return rev_data["revision"], rev_data["snap-yaml"]
 
 
-def fetch_op(snaps, *, f, decl_only=False):
+def fetch_op(snaps, *, f, meta=True, decls=True):
     for name in snaps:
         # creates dir <name> and caches values in <name>/.snap.json
         f.snap_ids(name)
 
-        if not decl_only:
-            snap_yaml = f.fetch_metadata(name)
+        if meta:
+            revision, snap_yaml = f.fetch_metadata(name)
             with open(f"{name}/snap.yaml", "w") as mf:
                 mf.write(snap_yaml)
+            with open(f"{name}/revision", "w") as rf:
+                rf.write(f"{revision}\n")
 
-    engine("fetch-decls", snaps=snaps)
+    if decls:
+        engine("fetch-decls", snaps=snaps)

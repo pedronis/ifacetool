@@ -12,11 +12,12 @@ def cli():
 
 
 @cli.command()
-@click.option("--decl-only", default=False, is_flag=True)
+@click.option("--meta/--no-meta", default=True)
+@click.option("--decls/--no-decls", default=True)
 @click.argument("snaps", nargs=-1, type=str, required=True)
-def fetch(snaps, decl_only):
+def fetch(snaps, meta, decls):
     f = Fetcher()
-    fetch_op(snaps, decl_only=decl_only, f=f)
+    fetch_op(snaps, meta=meta, decls=decls, f=f)
 
 
 @cli.command()
