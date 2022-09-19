@@ -51,6 +51,7 @@ class Fetcher:
 
 
 def fetch_op(snaps, *, f, meta=True, decls=True):
+    "fetch snap metadata and snap-declaration content"
     for name in snaps:
         # creates dir <name> and caches values in <name>/.snap.json
         f.snap_ids(name)

@@ -5,13 +5,25 @@ One central feature of ifacetool is simulating what snapd will
 do in terms of auto-connections for a group of snaps given snap
 metadata and snap-declaration content.
 
+Installation
+=============
+
+snap install --edge ifacetool
+
+To operate ifacetool needs to retrieve information from the store, it
+can do so useing `snapcraft login` credentials. These can be made
+available by:
+
+ * snap connect ifacetool:password-manager-service OR
+ * setting SNAPCRAFT_STORE_CREDENTIALS as per https://forum.snapcraft.io/t/snapcraft-authentication-options
+
 Commands
 =========
 
 fetch
 ------
 
-fetch [--no-decls] [--no-meta] <snap-name>[@rev]...
+ifacetool fetch [--no-decls] [--no-meta] <snap-name>[@rev]...
 
 fetch fetches snap metadata (at the given optional revisions) and snap
 declaration content for a set of snaps.
@@ -36,14 +48,15 @@ metadata or the snap-declaration rules to test.
 auto-connections
 -----------------
 
-auto-connections [--store <store-id>] [--model <brand>/<model>] <target-snap> [c<context snap>..]
+ifacetool auto-connections [--store <store-id>] [--model <brand>/<model>] <target-snap> [<context snap>...]
 
 auto-connections using the input from the corresponding snap directories (see fetch) does two things:
 
 * checks whether all snaps mentioned on the command line can be installed
   according to the rules
 * simulates which auto-connections would be established when installing
-  target-snap, assuming the presence of the listed context snaps
+  target-snap, assuming the presence of the listed context snaps, and prints
+  the auto-connecting slot/plug pairs
 
 --store and --model values are used when processing on-store/on-model/on-brand
 constraints in the rules.

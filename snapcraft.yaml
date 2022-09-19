@@ -1,7 +1,12 @@
 name: ifacetool
 summary: tooling to work with snap interfaces
 description: |
-  ifacetool...
+  ifacetool provides tooling to work with snap interfaces, in
+  particular their policies as realized via snap-declarations
+
+  One central feature of ifacetool is simulating what snapd will
+  do in terms of auto-connections for a group of snaps given snap
+  metadata and snap-declaration content.
 base: core20
 grade: devel
 confinement: strict

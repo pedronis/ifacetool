@@ -2,6 +2,7 @@ from .engine import engine
 
 
 def auto_connections_op(target_snap, context_snaps, model, store, f):
+    "simulate auto-connections"
     to_consider = set(context_snaps) | {target_snap}
     # prepare
     for name in to_consider:
