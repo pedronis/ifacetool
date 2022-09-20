@@ -28,6 +28,8 @@ ifacetool fetch [--no-decls] [--no-meta] <snap-name>[@rev]...
 fetch fetches snap metadata (at the given optional revisions) and snap
 declaration content for a set of snaps.
 
+NOTE: @rev is not implemented yet
+
 For each snap it creates directories in the current working dir that
 look like this:
 
@@ -57,6 +59,10 @@ auto-connections using the input from the corresponding snap directories (see fe
 * simulates which auto-connections would be established when installing
   target-snap, assuming the presence of the listed context snaps, and prints
   the auto-connecting slot/plug pairs
+
+NOTE: the output of this command needs refining, also it will need to
+produce more output optionally to help debug situations where an
+expected auto-connection is not established
 
 --store and --model values are used when processing on-store/on-model/on-brand
 constraints in the rules.
