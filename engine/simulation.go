@@ -30,6 +30,7 @@ import (
 	"github.com/snapcore/snapd/overlord/snapstate/snapstatetest"
 	"github.com/snapcore/snapd/overlord/state"
 	"github.com/snapcore/snapd/release"
+	apparmor_sandbox "github.com/snapcore/snapd/sandbox/apparmor"
 	seccomp_compiler "github.com/snapcore/snapd/sandbox/seccomp"
 	"github.com/snapcore/snapd/snap"
 )
@@ -164,6 +165,23 @@ func (s *oneshotSimulation) setup(classic bool) {
 
 	s.secBackend = &ifacetest.TestSecurityBackend{}
 	ifacestate.MockSecurityBackends([]interfaces.SecurityBackend{s.secBackend})
+	apparmor_sandbox.MockFeatures([]string{
+		"caps",
+		"dbus",
+		"domain",
+		"file",
+		"mount",
+		"namespaces",
+		"network",
+		"ptrace",
+		"signal",
+	}, nil, []string{
+		"unsafe",
+		"qipcrtr-socket",
+		"cap-bpf",
+		"cap-audit-read",
+		"mqueue",
+	}, nil)
 
 	buf, _ := logger.MockLogger()
 	s.log = buf
@@ -280,6 +298,9 @@ func checkInstall(modelAs *asserts.Model, info *snap.Info, decl *asserts.SnapDec
 
 	err := ic.Check()
 	fmt.Printf("installing %s: %v\n", info.SnapName(), err)
+	if len(info.BadInterfaces) != 0 {
+		fmt.Printf("bad-interfaces: %v\n", info.BadInterfaces)
+	}
 }
 
 type autoConnectSimulation struct {
