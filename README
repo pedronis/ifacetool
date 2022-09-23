@@ -28,8 +28,6 @@ ifacetool fetch [--no-decls] [--no-meta] <snap-name>[@rev]...
 fetch fetches snap metadata (at the given optional revisions) and snap
 declaration content for a set of snaps.
 
-NOTE: @rev is not implemented yet
-
 For each snap it creates directories in the current working dir that
 look like this:
 

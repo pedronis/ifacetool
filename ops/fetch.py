@@ -1,5 +1,6 @@
 import os
 import json
+from collections import namedtuple
 
 from craft_store import UbuntuOneStoreClient, endpoints
 
@@ -18,7 +19,8 @@ class Fetcher:
             user_agent="ifacetool",
         )
 
-    def snap_ids(self, name):
+    def snap_ids(self, snap_at_rev):
+        name = snap_at_rev.name
         info_fn = f"{name}/.snap.json"
         if os.path.isfile(info_fn):
             with open(info_fn) as info_f:
@@ -39,7 +41,8 @@ class Fetcher:
                 info_f.write("\n")
         return info["snap-id"], info["publisher-id"]
 
-    def fetch_metadata(self, name, revno=None):
+    def fetch_metadata(self, snap_at_rev):
+        name, revno = snap_at_rev
         if revno is None:
             revno = "latest"
         rsp = self.c.request(
@@ -50,18 +53,23 @@ class Fetcher:
         return rev_data["revision"], rev_data["snap-yaml"]
 
 
+snap_at_rev = namedtuple("snap_at_rev", ["name", "revision"], defaults=[None])
+
+
 def fetch_op(snaps, *, f, meta=True, decls=True):
     "fetch snap metadata and snap-declaration content"
-    for name in snaps:
+    snap_names = []
+    for snap in snaps:
         # creates dir <name> and caches values in <name>/.snap.json
-        f.snap_ids(name)
+        f.snap_ids(snap)
+        snap_names.append(snap.name)
 
         if meta:
-            revision, snap_yaml = f.fetch_metadata(name)
-            with open(f"{name}/snap.yaml", "w") as mf:
+            revision, snap_yaml = f.fetch_metadata(snap)
+            with open(f"{snap.name}/snap.yaml", "w") as mf:
                 mf.write(snap_yaml)
-            with open(f"{name}/revision", "w") as rf:
+            with open(f"{snap.name}/revision", "w") as rf:
                 rf.write(f"{revision}\n")
 
     if decls:
-        engine("fetch-decls", snaps=snaps)
+        engine("fetch-decls", snaps=snap_names)

@@ -3,7 +3,31 @@ from ops import (
     Fetcher,
     auto_connections_op,
     fetch_op,
+    snap_at_rev,
 )
+
+
+class SnapAtRevType(click.ParamType):
+    name = "snap@rev"
+
+    def convert(self, value, param, ctx):
+        if isinstance(value, snap_at_rev):
+            return value
+
+        parts = value.rsplit("@", 1)
+        if len(parts) == 1:
+            return snap_at_rev(value)
+
+        try:
+            revno = int(parts[1])
+            if revno <= 0:
+                raise ValueError
+            return snap_at_rev(parts[0], revno)
+        except ValueError:
+            self.fail(f"{parts[1]!r} in {value!r} is not a valid revision", param, ctx)
+
+
+SNAP_AT_REV = SnapAtRevType()
 
 
 @click.group()
@@ -14,7 +38,9 @@ def cli():
 @cli.command(short_help=fetch_op.__doc__, help=fetch_op.__doc__)
 @click.option("--meta/--no-meta", default=True)
 @click.option("--decls/--no-decls", default=True)
-@click.argument("snaps", nargs=-1, type=str, required=True, metavar="<snap>...")
+@click.argument(
+    "snaps", nargs=-1, type=SNAP_AT_REV, required=True, metavar="<snap>[@<rev>]..."
+)
 def fetch(snaps, meta, decls):
     f = Fetcher()
     fetch_op(snaps, meta=meta, decls=decls, f=f)
