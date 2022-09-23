@@ -67,6 +67,7 @@ constraints in the rules.
 
 Ideas
 ======
+review-tools at tag for snap.yaml
 can-install snap
 can-connect snap-plug snap-slot
 allow-installation slot-or-plug
