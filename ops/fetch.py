@@ -19,8 +19,7 @@ class Fetcher:
             user_agent="ifacetool",
         )
 
-    def snap_ids(self, snap_at_rev):
-        name = snap_at_rev.name
+    def snap_ids(self, name):
         info_fn = f"{name}/.snap.json"
         if os.path.isfile(info_fn):
             with open(info_fn) as info_f:
@@ -61,7 +60,7 @@ def fetch_op(snaps, *, f, meta=True, decls=True):
     snap_names = []
     for snap in snaps:
         # creates dir <name> and caches values in <name>/.snap.json
-        f.snap_ids(snap)
+        f.snap_ids(snap.name)
         snap_names.append(snap.name)
 
         if meta:
