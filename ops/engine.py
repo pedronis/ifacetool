@@ -30,8 +30,7 @@ def engine(op, **params):
         return subprocess.run(
             [engpgm, op, param],
             check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            capture_output=True,
         ).stdout
     except subprocess.CalledProcessError as pe:
         raise Exception("{}, err: {}".format(pe, pe.stderr.decode("utf8")))

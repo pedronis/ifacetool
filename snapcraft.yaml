@@ -2,7 +2,7 @@ name: ifacetool
 summary: tooling to work with snap interfaces
 description: |
   ifacetool provides tooling to work with snap interfaces, in
-  particular their policies as realized via snap-declarations
+  particular their policies as realized via snap-declarations.
 
   One central feature of ifacetool is simulating what snapd will
   do in terms of auto-connections for a group of snaps given snap
@@ -22,6 +22,8 @@ parts:
   ifacetool:
     plugin: python
     source: .
+    stage-packages:
+      - squashfs-tools
     override-pull: |
       snapcraftctl pull
       snapcraftctl set-version "$(cat VERSION)-$(cat SNAPD_VERSION)"

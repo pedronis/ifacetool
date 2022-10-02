@@ -1,5 +1,5 @@
 ifacetool provides tooling to work with snap interfaces, in
-particular their policies as realized via snap-declarations
+particular their policies as realized via snap-declarations.
 
 One central feature of ifacetool is simulating what snapd will
 do in terms of auto-connections for a group of snaps given snap
@@ -11,7 +11,7 @@ Installation
 snap install --edge ifacetool
 
 To operate ifacetool needs to retrieve information from the store, it
-can do so useing `snapcraft login` credentials. These can be made
+can do so using `snapcraft login` credentials. These can be made
 available by:
 
  * snap connect ifacetool:password-manager-service OR
@@ -44,6 +44,11 @@ of the snap declaration interface rule stanzas.
 These directories named after the snaps are the input for all other
 commands, they also allow to apply tentative modifications to the
 metadata or the snap-declaration rules to test.
+
+For convenience <snap-name> can also be a path pointing to a .snap file or
+directly to a local snap.yaml file. The file extension is used to detect this
+usage. Snap metadata will then come from those local sources. The snap overall
+still needs to exist in the store for its snap-id etc.
 
 auto-connections
 -----------------
