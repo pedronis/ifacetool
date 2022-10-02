@@ -7,6 +7,7 @@ description: |
   One central feature of ifacetool is simulating what snapd will
   do in terms of auto-connections for a group of snaps given snap
   metadata and snap-declaration content.
+license: GPL-3.0
 base: core20
 grade: devel
 confinement: strict
