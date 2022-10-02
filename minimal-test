@@ -1,0 +1,14 @@
+#!/usr/bin/bash
+proj=$(dirname "$0")
+
+declare -a run
+if [ "$1" = "dev" ]; then
+  export PYTHONPATH=${proj}
+  run=("${proj}/venv/bin/python3" -m ifacetool)
+else
+  run=(ifacetool)
+fi
+set -xe
+
+"${run[@]}" fetch firefox gtk-common-themes
+"${run[@]}" auto-connections firefox gtk-common-themes
