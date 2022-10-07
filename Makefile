@@ -16,7 +16,7 @@ clean-envs:
 
 stylelint:
 	$(TOOLENV)/black ifacetool.py ops
-	$(TOOLENV)/flake8 --max-line-length=99 ifacetool.py ops
+	$(TOOLENV)/flake8 --ignore E203 --max-line-length=99 ifacetool.py ops
 
 get-snapd:
 	go get github.com/snapcore/snapd@$(SNAPD_VERSION)
