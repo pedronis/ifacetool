@@ -27,7 +27,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"sort"
 	"strconv"
 	"time"
 
@@ -302,7 +301,7 @@ version: 1
 type: snapd
 `
 
-func checkInstall(modelAs *asserts.Model, info *snap.Info, decl *asserts.SnapDeclaration) {
+func checkInstall(modelAs *asserts.Model, info *snap.Info, decl *asserts.SnapDeclaration) installation {
 	baseDecl := asserts.BuiltinBaseDeclaration()
 
 	ic := policy.InstallCandidate{
@@ -316,9 +315,14 @@ func checkInstall(modelAs *asserts.Model, info *snap.Info, decl *asserts.SnapDec
 	}
 
 	err := ic.Check()
-	fmt.Printf("installing %s: %v\n", info.SnapName(), err)
-	if len(info.BadInterfaces) != 0 {
-		fmt.Printf("bad-interfaces: %v\n", info.BadInterfaces)
+	var errStr string
+	if err != nil {
+		errStr = err.Error()
+	}
+	return installation{
+		SnapName:      info.SnapName(),
+		Error:         errStr,
+		BadInterfaces: info.BadInterfaces,
 	}
 }
 
@@ -329,6 +333,34 @@ type autoConnectSimulation struct {
 
 	TargetSnap string   `json:"target-snap"`
 	Snaps      []string `json:"snaps"`
+}
+
+type installation struct {
+	SnapName      string            `json:"snap-name"`
+	Error         string            `json:"error"`
+	BadInterfaces map[string]string `json:"bad-interfaces,omitempty"`
+}
+
+type side struct {
+	Interface string `json:"interface"`
+	Name      string `json:"name"`
+}
+
+type connection struct {
+	Interface string             `json:"interface"`
+	PlugRef   interfaces.PlugRef `json:"plug"`
+	SlotRef   interfaces.SlotRef `json:"slot"`
+	// plug and/or slot are on the target snap
+	OnTarget []string `json:"on-target"`
+}
+
+type autoConnectSimulationResult struct {
+	Installing []installation `json:"installing"`
+
+	Plugs []side `json:"plugs"`
+	Slots []side `json:"slots"`
+
+	Connections []connection `json:"connections"`
 }
 
 func (s *oneshotSimulation) simulateAutoConnect(params *autoConnectSimulation) {
@@ -379,6 +411,10 @@ func (s *oneshotSimulation) simulateAutoConnect(params *autoConnectSimulation) {
 		s.mockSnapDecl(ref.PublisherID, d)
 	}
 
+	targetSnap := params.TargetSnap
+	var targetInfo *snap.Info
+
+	var res autoConnectSimulationResult
 	// Add snap metadata, and populate repo
 	for name := range seen {
 		snapYamlFn := filepath.Join(name, "snap.yaml")
@@ -386,16 +422,37 @@ func (s *oneshotSimulation) simulateAutoConnect(params *autoConnectSimulation) {
 		noerror(err)
 		snapInfo, snapDecl := s.mockSnap(string(b))
 
-		checkInstall(modelAs, snapInfo, snapDecl)
+		inst := checkInstall(modelAs, snapInfo, snapDecl)
 
 		err = mgr.Repository().AddSnap(snapInfo)
 		noerror(err)
+
+		res.Installing = append(res.Installing, inst)
+
+		if name != targetSnap {
+			continue
+		}
+		targetInfo = snapInfo
+
+		for plugName, plug := range targetInfo.Plugs {
+			res.Plugs = append(res.Plugs, side{
+				Interface: plug.Interface,
+				Name:      plugName,
+			})
+		}
+
+		for slotName, slot := range targetInfo.Slots {
+			res.Slots = append(res.Slots, side{
+				Interface: slot.Interface,
+				Name:      slotName,
+			})
+		}
 	}
 
 	// Run the setup-snap-security task and let it finish.
 	change := s.addSetupSnapSecurityChange(&snapstate.SnapSetup{
 		SideInfo: &snap.SideInfo{
-			RealName: params.TargetSnap,
+			RealName: targetSnap,
 			Revision: snap.R(1),
 		},
 	})
@@ -409,20 +466,34 @@ func (s *oneshotSimulation) simulateAutoConnect(params *autoConnectSimulation) {
 	err = change.Err()
 	noerror(err)
 
-	var conns []string
 	for _, t := range change.Tasks() {
 		if t.Kind() == "connect" {
 			var plugRef interfaces.PlugRef
 			var slotRef interfaces.SlotRef
 			t.Get("plug", &plugRef)
 			t.Get("slot", &slotRef)
-			conns = append(conns, fmt.Sprintf("%v > %v", slotRef, plugRef))
+			var iface string
+			var onTarget []string
+			if slotRef.Snap == targetSnap {
+				onTarget = append(onTarget, "slot")
+				iface = targetInfo.Slots[slotRef.Name].Interface
+			}
+			if plugRef.Snap == targetSnap {
+				onTarget = append(onTarget, "plug")
+				iface = targetInfo.Plugs[plugRef.Name].Interface
+			}
+			res.Connections = append(res.Connections, connection{
+				Interface: iface,
+				PlugRef:   plugRef,
+				SlotRef:   slotRef,
+				OnTarget:  onTarget,
+			})
 		}
 	}
-	sort.Strings(conns)
-	for _, conn := range conns {
-		fmt.Println(conn)
-	}
+
+	b, err := json.Marshal(&res)
+	noerror(err)
+	fmt.Println(string(b))
 }
 
 func loadJSON(fn string) (res map[string]interface{}, err error) {

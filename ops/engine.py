@@ -27,10 +27,15 @@ def engine(op, **params):
         engpgm = os.path.basename(engpgm)
     param = json.dumps(params)
     try:
-        return subprocess.run(
+        out = subprocess.run(
             [engpgm, op, param],
             check=True,
             capture_output=True,
         ).stdout
     except subprocess.CalledProcessError as pe:
         raise Exception("{}, err: {}".format(pe, pe.stderr.decode("utf8")))
+    if out.startswith(b"AppArmor status:"):
+        out = out[out.find(b"\n") + 1 :]
+    if not out:
+        return None
+    return json.loads(out)

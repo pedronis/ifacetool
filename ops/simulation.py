@@ -33,6 +33,71 @@ def auto_connections_op(target_snap, context_snaps, model, store, f):
     if store:
         params["store"] = store
     out = engine("auto-connections", **params)
-    # XXX use structured json
-    # XXX AppArmor blah
-    print(out.decode("utf8"), end="")
+
+    # installing issues
+    installing = {}
+    for inst in out["installing"]:
+        installing[inst["snap-name"]] = inst
+    seen = set()
+
+    def prinst(name):
+        if name in seen:
+            return
+        seen.add(name)
+        inst = installing[name]
+        inst_res = "OK"
+        if inst["error"] != "":
+            inst_res = inst["error"]
+        print(f"installing {name}: {inst_res}")
+        badifaces = inst.get("bad-interfaces")
+        if badifaces:
+            print(f"  bad-interfaces: {badifaces}")
+
+    for name in context_snaps:
+        if name == target_snap:
+            continue
+        prinst(name)
+    prinst(target_snap)
+
+    # connections
+    conns = out["connections"]
+    if conns is None:
+        conns = []
+
+    def conn_key(conn):
+        on_target = set(conn["on-target"])
+        if on_target == {"plug", "slot"}:
+            return (0, conn["plug"]["snap"], conn["plug"]["plug"], conn["slot"]["slot"])
+        elif on_target == {"slot"}:
+            return (1, conn["plug"]["snap"], conn["plug"]["plug"], conn["slot"]["slot"])
+        else:  # plug
+            return (2, conn["slot"]["snap"], conn["slot"]["slot"], conn["plug"]["plug"])
+
+    conns.sort(key=conn_key)
+    connected_plugs = set()
+    connected_slots = set()
+
+    def prconn(conn):
+        if "slot" in conn["on-target"]:
+            print(
+                f"{conn['plug']['snap']}:{conn['plug']['plug']} < {conn['slot']['slot']}"
+            )
+            connected_slots.add(conn["slot"]["slot"])
+        else:
+            print(
+                f"{conn['slot']['snap']}:{conn['slot']['slot']} > {conn['plug']['plug']}"
+            )
+        if "plug" in conn["on-target"]:
+            connected_plugs.add(conn["plug"]["plug"])
+
+    for conn in conns:
+        prconn(conn)
+
+    # dangling plugs
+    plugs = out["plugs"]
+    if plugs is None:
+        plugs = []
+    for plug in plugs:
+        name = plug["name"]
+        if name not in connected_plugs:
+            print(f": {name}")
