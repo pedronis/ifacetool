@@ -97,6 +97,7 @@ def auto_connections_op(target_snap, context_snaps, model, store, f):
     plugs = out["plugs"]
     if plugs is None:
         plugs = []
+    plugs.sort(key=lambda p: p["name"])
     for plug in plugs:
         name = plug["name"]
         if name not in connected_plugs:
