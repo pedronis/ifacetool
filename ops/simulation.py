@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
+
 from .engine import engine
 
 
@@ -34,6 +36,10 @@ def auto_connections_op(target_snap, context_snaps, model, store, classic, f):
     if store:
         params["store"] = store
     out = engine("auto-connections", **params)
+
+    if "error" in out:
+        print(f'simulation: {out["error"]}', file=sys.stderr)
+        sys.exit(1)
 
     # installing issues
     installing = {}

@@ -99,7 +99,7 @@ func (am *assertsMock) mockModel(extraHeaders map[string]interface{}) *asserts.M
 	return model
 }
 
-func (am *assertsMock) mockSnapDecl(publisher string, extraHeaders map[string]interface{}) {
+func (am *assertsMock) mockSnapDecl(publisher string, extraHeaders map[string]interface{}) error {
 	_, err := am.db.Find(asserts.AccountType, map[string]string{
 		"account-id": publisher,
 	})
@@ -120,14 +120,20 @@ func (am *assertsMock) mockSnapDecl(publisher string, extraHeaders map[string]in
 	}
 
 	fnum, err := asserts.SuggestFormat(asserts.SnapDeclarationType, headers, nil)
-	noerror(err)
+	if err != nil {
+		return err
+	}
 	headers["format"] = strconv.Itoa(fnum)
 
 	snapDecl, err := am.storeSigning.Sign(asserts.SnapDeclarationType, headers, nil, "")
-	noerror(err)
+	if err != nil {
+		return err
+	}
 
 	err = am.db.Add(snapDecl)
 	noerror(err)
+
+	return nil
 }
 
 func (am *assertsMock) mockStore(st *state.State, storeID string, extraHeaders map[string]interface{}) {
@@ -250,11 +256,14 @@ func (s *oneshotSimulation) hookManager() *hookstate.HookManager {
 	return mgr
 }
 
-func (s *oneshotSimulation) mockSnap(yamlText string) (*snap.Info, *asserts.SnapDeclaration) {
+func (s *oneshotSimulation) mockSnap(yamlText string) (*snap.Info, *asserts.SnapDeclaration, error) {
 	sideInfo := &snap.SideInfo{
 		Revision: snap.R(1),
 	}
-	snapInfo := mockDiskSnap(yamlText, sideInfo)
+	snapInfo, err := mockDiskSnap(yamlText, sideInfo)
+	if err != nil {
+		return nil, nil, err
+	}
 	sideInfo.RealName = snapInfo.SnapName()
 
 	var decl *asserts.SnapDeclaration
@@ -281,7 +290,7 @@ func (s *oneshotSimulation) mockSnap(yamlText string) (*snap.Info, *asserts.Snap
 		SnapType:    string(snapInfo.Type()),
 		InstanceKey: snapInfo.InstanceKey,
 	})
-	return snapInfo, decl
+	return snapInfo, decl, nil
 }
 
 func (s *oneshotSimulation) addSetupSnapSecurityChange(snapsup *snapstate.SnapSetup) *state.Change {
@@ -365,7 +374,7 @@ type autoConnectSimulationResult struct {
 	Connections []connection `json:"connections"`
 }
 
-func (s *oneshotSimulation) simulateAutoConnect(params *autoConnectSimulation) {
+func (s *oneshotSimulation) simulateAutoConnect(params *autoConnectSimulation) error {
 	modelHdrs := map[string]interface{}{
 		"authority-id": params.Brand,
 		"brand-id":     params.Brand,
@@ -410,7 +419,9 @@ func (s *oneshotSimulation) simulateAutoConnect(params *autoConnectSimulation) {
 			noerror(err)
 			d["slots"] = slots
 		}
-		s.mockSnapDecl(ref.PublisherID, d)
+		if err := s.mockSnapDecl(ref.PublisherID, d); err != nil {
+			return fmt.Errorf("processing snap %s rules: %v", name, err)
+		}
 	}
 
 	targetSnap := params.TargetSnap
@@ -422,12 +433,17 @@ func (s *oneshotSimulation) simulateAutoConnect(params *autoConnectSimulation) {
 		snapYamlFn := filepath.Join(name, "snap.yaml")
 		b, err := ioutil.ReadFile(snapYamlFn)
 		noerror(err)
-		snapInfo, snapDecl := s.mockSnap(string(b))
+		snapInfo, snapDecl, err := s.mockSnap(string(b))
+		if err != nil {
+			return fmt.Errorf("processing snap %s: %v", name, err)
+		}
 
 		inst := checkInstall(modelAs, snapInfo, snapDecl)
 
 		err = mgr.Repository().AddSnap(snapInfo)
-		noerror(err)
+		if err != nil {
+			return fmt.Errorf("processing snap %s: %v", snapInfo.SnapName(), err)
+		}
 
 		res.Installing = append(res.Installing, inst)
 
@@ -496,6 +512,7 @@ func (s *oneshotSimulation) simulateAutoConnect(params *autoConnectSimulation) {
 	b, err := json.Marshal(&res)
 	noerror(err)
 	fmt.Println(string(b))
+	return nil
 }
 
 func loadJSON(fn string) (res map[string]interface{}, err error) {
@@ -509,10 +526,12 @@ func loadJSON(fn string) (res map[string]interface{}, err error) {
 	return res, nil
 }
 
-func mockDiskSnap(yamlText string, sideInfo *snap.SideInfo) *snap.Info {
+func mockDiskSnap(yamlText string, sideInfo *snap.SideInfo) (*snap.Info, error) {
 	// Parse the yaml (we need the Name).
 	snapInfo, err := snap.InfoFromSnapYaml([]byte(yamlText))
-	noerror(err)
+	if err != nil {
+		return nil, err
+	}
 
 	// Set SideInfo so that we can use MountDir below
 	snapInfo.SideInfo = *sideInfo
@@ -532,7 +551,7 @@ func mockDiskSnap(yamlText string, sideInfo *snap.SideInfo) *snap.Info {
 	noerror(err)
 	snapInfo.Size = int64(len(snapContents))
 
-	return snapInfo
+	return snapInfo, nil
 }
 
 // Operations
@@ -545,7 +564,17 @@ func autoConnections(param *json.RawMessage) error {
 
 	sim := oneshotSimulation{}
 	sim.setup(params.Classic)
-	sim.simulateAutoConnect(&params)
+	err := sim.simulateAutoConnect(&params)
+	if err != nil {
+		var errRes struct {
+			Error string `json:"error"`
+		}
+		errRes.Error = err.Error()
+		b, err := json.Marshal(&errRes)
+		noerror(err)
+		fmt.Println(string(b))
+		return nil
+	}
 	sim.finish()
 
 	return nil
