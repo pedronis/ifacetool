@@ -53,7 +53,7 @@ still needs to exist in the store for its snap-id etc.
 auto-connections
 -----------------
 
-ifacetool auto-connections [--store <store-id>] [--model <brand>/<model>] <target-snap> [<context snap>...]
+ifacetool auto-connections [--classic] [--store <store-id>] [--model <brand>/<model>] <target-snap> [<context snap>...]
 
 auto-connections using the input from the corresponding snap directories (see fetch) does two things:
 
@@ -77,6 +77,8 @@ where an expected auto-connection is not established
 
 --store and --model values are used when processing on-store/on-model/on-brand
 constraints in the rules.
+
+--classic requests to simulate the behavior as on a classic system, the default is an Ubuntu Core system.
 
 Ideas
 ======

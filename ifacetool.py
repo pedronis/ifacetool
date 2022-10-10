@@ -65,11 +65,14 @@ def fetch(snaps, meta, decls):
 @cli.command(short_help=auto_connections_op.__doc__, help=auto_connections_op.__doc__)
 @click.option("--model", type=str, default="brand/model", metavar="<brand>/<model>")
 @click.option("--store", type=str, default=None, metavar="<store-id>")
+@click.option("--classic", is_flag=True, default=False)
 @click.argument("target-snap", type=str, required=True, metavar="<target-snap>")
 @click.argument("context-snaps", type=str, nargs=-1, metavar="<context-snap>...")
-def auto_connections(target_snap, context_snaps, model, store):
+def auto_connections(target_snap, context_snaps, model, store, classic):
     f = Fetcher()
-    auto_connections_op(target_snap, context_snaps, model=model, store=store, f=f)
+    auto_connections_op(
+        target_snap, context_snaps, model=model, store=store, classic=classic, f=f
+    )
 
 
 if __name__ == "__main__":

@@ -327,6 +327,8 @@ func checkInstall(modelAs *asserts.Model, info *snap.Info, decl *asserts.SnapDec
 }
 
 type autoConnectSimulation struct {
+	Classic bool `json:"classic"`
+
 	Brand string `json:"brand"`
 	Model string `json:"model"`
 	Store string `json:"store"`
@@ -542,8 +544,7 @@ func autoConnections(param *json.RawMessage) error {
 	}
 
 	sim := oneshotSimulation{}
-	// assume Ubuntu Core
-	sim.setup(false)
+	sim.setup(params.Classic)
 	sim.simulateAutoConnect(&params)
 	sim.finish()
 

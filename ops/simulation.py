@@ -17,7 +17,7 @@
 from .engine import engine
 
 
-def auto_connections_op(target_snap, context_snaps, model, store, f):
+def auto_connections_op(target_snap, context_snaps, model, store, classic, f):
     "simulate auto-connections"
     to_consider = set(context_snaps) | {target_snap}
     # prepare
@@ -25,6 +25,7 @@ def auto_connections_op(target_snap, context_snaps, model, store, f):
         f.snap_ids(name)
     brand, model = model.split("/", 2)
     params = {
+        "classic": classic,
         "brand": brand,
         "model": model,
         "target-snap": target_snap,
