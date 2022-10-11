@@ -365,13 +365,55 @@ type connection struct {
 	OnTarget []string `json:"on-target"`
 }
 
+type candidate struct {
+	Interface string             `json:"interface"`
+	PlugRef   interfaces.PlugRef `json:"plug"`
+	SlotRef   interfaces.SlotRef `json:"slot"`
+
+	PlugStaticAttrs  map[string]interface{} `json:"plug-static-attrs"`
+	PlugDynamicAttrs map[string]interface{} `json:"plug-dynamic-attrs"`
+	SlotStaticAttrs  map[string]interface{} `json:"slot-static-attrs"`
+	SlotDynamicAttrs map[string]interface{} `json:"slot-dynamic-attrs"`
+
+	CheckError string `json:"check-error"`
+
+	SlotsPerPlugAny bool `json:"slots-per-plug-any"`
+}
+
 type autoConnectSimulationResult struct {
+	targetSnap string
+
 	Installing []installation `json:"installing"`
 
 	Plugs []side `json:"plugs"`
 	Slots []side `json:"slots"`
 
 	Connections []connection `json:"connections"`
+
+	SlotCandidates map[string][]candidate `json:"slot-candidates"`
+	PlugCandidates map[string][]candidate `json:"plug-candidates"`
+}
+
+func (r *autoConnectSimulationResult) debugAutoConnectCheck(cc *policy.ConnectCandidate, arity interfaces.SideArity, checkErr error) {
+	var cand candidate
+	cand.Interface = cc.Plug.Interface()
+	cand.PlugRef = *cc.Plug.Ref()
+	cand.SlotRef = *cc.Slot.Ref()
+	cand.PlugStaticAttrs = cc.Plug.StaticAttrs()
+	cand.PlugDynamicAttrs = cc.Plug.DynamicAttrs()
+	cand.SlotStaticAttrs = cc.Slot.StaticAttrs()
+	cand.SlotDynamicAttrs = cc.Slot.DynamicAttrs()
+	if checkErr != nil {
+		cand.CheckError = checkErr.Error()
+	} else {
+		cand.SlotsPerPlugAny = arity.SlotsPerPlugAny()
+	}
+	if cand.PlugRef.Snap == r.targetSnap {
+		r.SlotCandidates[cand.PlugRef.Name] = append(r.SlotCandidates[cand.PlugRef.Name], cand)
+	}
+	if cand.SlotRef.Snap == r.targetSnap {
+		r.PlugCandidates[cand.SlotRef.Name] = append(r.PlugCandidates[cand.SlotRef.Name], cand)
+	}
 }
 
 func (s *oneshotSimulation) simulateAutoConnect(params *autoConnectSimulation) error {
@@ -428,6 +470,11 @@ func (s *oneshotSimulation) simulateAutoConnect(params *autoConnectSimulation) e
 	var targetInfo *snap.Info
 
 	var res autoConnectSimulationResult
+	// wire-up things for candidate collection
+	res.targetSnap = targetSnap
+	ifacestate.DebugAutoConnectCheck = res.debugAutoConnectCheck
+	res.SlotCandidates = make(map[string][]candidate)
+	res.PlugCandidates = make(map[string][]candidate)
 	// Add snap metadata, and populate repo
 	for name := range seen {
 		snapYamlFn := filepath.Join(name, "snap.yaml")

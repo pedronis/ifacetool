@@ -20,7 +20,7 @@ from .engine import engine
 
 
 def auto_connections_op(
-    target_snap, context_snaps, interface, model, store, classic, f
+    target_snap, context_snaps, interface, candidates, model, store, classic, f
 ):
     "simulate auto-connections"
     to_consider = set(context_snaps) | {target_snap}
@@ -99,11 +99,15 @@ def auto_connections_op(
             print(
                 f"{conn['plug']['snap']}:{conn['plug']['plug']} < {conn['slot']['slot']}"
             )
+            if candidates:
+                prcandidates(out, conn["slot"]["slot"], other_side="plug", happy=True)
             connected_slots.add(conn["slot"]["slot"])
         else:
             print(
                 f"{conn['slot']['snap']}:{conn['slot']['slot']} > {conn['plug']['plug']}"
             )
+            if candidates:
+                prcandidates(out, conn["plug"]["plug"], other_side="slot", happy=True)
         if "plug" in conn["on-target"]:
             connected_plugs.add(conn["plug"]["plug"])
 
@@ -121,3 +125,62 @@ def auto_connections_op(
         name = plug["name"]
         if name not in connected_plugs:
             print(f": {name}")
+            if candidates:
+                prcandidates(out, name, other_side="slot", happy=False)
+
+
+def prcandidates(out, name, other_side, happy):
+    cands = out[f"{other_side}-candidates"].get(name, ())
+    side = "plug"
+    if other_side == "plug":
+        side = "slot"
+    if happy and len(cands) == 1:
+        return
+    if not happy and len(cands) == 0:
+        return
+
+    def cand_key(cand):
+        order = 1
+        if cand["check-error"]:
+            order = 0
+        else:
+            if cand["slots-per-plug-any"]:
+                order = 2
+        return (order, cand[other_side]["snap"], cand[other_side][other_side])
+
+    cands.sort(key=cand_key)
+    own_attr = False
+    seen = set()
+    check_err = None
+    for cand in cands:
+        if not own_attr:
+            label = ilabel(cand, side)
+            if label:
+                print(f"  {label}")
+            own_attr = True
+        other = f"{cand[other_side]['snap']}:{cand[other_side][other_side]}"
+        if other in seen:
+            continue
+        seen.add(other)
+        other_label = ilabel(cand, other_side)
+        print(f"    {other} {other_label}")
+        if cand["check-error"]:
+            if cand["check-error"] != check_err:
+                check_err = cand["check-error"]
+                print(f"    => {check_err}")
+            else:
+                print("    => //")
+        else:
+            if cand["slots-per-plug-any"]:
+                print("    => ok slots-per-plug:*")
+            else:
+                print("    => ok")
+
+
+def ilabel(cand, side):
+    attrs = cand[f"{side}-static-attrs"]
+    iface = cand["interface"]
+    label = attrs.get(iface)
+    if label:
+        return f"{{{iface}: {label}}}"
+    return ""

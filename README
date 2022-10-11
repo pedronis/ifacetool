@@ -53,7 +53,7 @@ still needs to exist in the store for its snap-id etc.
 auto-connections
 -----------------
 
-ifacetool auto-connections [--classic] [--store <store-id>] [--model <brand>/<model>] [-i|--interface <interface>] <target-snap> [<context snap>...]
+ifacetool auto-connections [--classic] [--store <store-id>] [--model <brand>/<model>] [-i|--interface <interface>] [--candidates] <target-snap> [<context snap>...]
 
 auto-connections using the input from the corresponding snap directories (see fetch) does two things:
 
@@ -75,8 +75,15 @@ The output report has two corresponding parts:
   this part can be filtered to only show connections and plugs for a given
   interface using -i|--interface <interface>
 
-NOTE: this will need to produce more output optionally to help debug situations
-where an expected auto-connection is not established
+--candidates enables listing of candidates that were considered in the case were there was auto-connections but multiple candidates were in play or in the case that no auto-connection was established. For each candidate the result of checking whether it is allowed is displayed:
+
+* `=> ok` allowed
+* `=> ok slots-per-plug:*` allowed with `slots-per-plug: *`
+* `=> <error>` not allowed with error
+* `=> //` same error as the previous candidate
+
+The notation `{<label>: <value>}` displays the label attribute usually
+considered to allow auto-connection of interfaces like content, etc...
 
 --store and --model values are used when processing on-store/on-model/on-brand
 constraints in the rules.
@@ -85,6 +92,10 @@ constraints in the rules.
 
 Changelog
 ==========
+
+0.6
+---
+ * support --candidates for further debugging
 
 0.5
 ----
