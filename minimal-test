@@ -11,5 +11,5 @@ fi
 set -xe
 
 "${run[@]}" fetch firefox gtk-common-themes
-"${run[@]}" auto-connections firefox gtk-common-themes
+"${run[@]}" auto-connections --classic firefox gtk-common-themes
 "${run[@]}" auto-connections gtk-common-themes firefox
