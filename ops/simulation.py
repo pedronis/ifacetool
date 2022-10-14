@@ -19,7 +19,9 @@ import sys
 from .engine import engine
 
 
-def auto_connections_op(target_snap, context_snaps, model, store, classic, f):
+def auto_connections_op(
+    target_snap, context_snaps, interface, model, store, classic, f
+):
     "simulate auto-connections"
     to_consider = set(context_snaps) | {target_snap}
     # prepare
@@ -84,7 +86,15 @@ def auto_connections_op(target_snap, context_snaps, model, store, classic, f):
     connected_plugs = set()
     connected_slots = set()
 
+    def relevant(x):
+        if interface is None:
+            return True
+        return x["interface"] == interface
+
     def prconn(conn):
+        if not relevant(conn):
+            # skip
+            return
         if "slot" in conn["on-target"]:
             print(
                 f"{conn['plug']['snap']}:{conn['plug']['plug']} < {conn['slot']['slot']}"
@@ -106,6 +116,8 @@ def auto_connections_op(target_snap, context_snaps, model, store, classic, f):
         plugs = []
     plugs.sort(key=lambda p: p["name"])
     for plug in plugs:
+        if not relevant(plug):
+            continue
         name = plug["name"]
         if name not in connected_plugs:
             print(f": {name}")

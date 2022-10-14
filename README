@@ -53,7 +53,7 @@ still needs to exist in the store for its snap-id etc.
 auto-connections
 -----------------
 
-ifacetool auto-connections [--classic] [--store <store-id>] [--model <brand>/<model>] <target-snap> [<context snap>...]
+ifacetool auto-connections [--classic] [--store <store-id>] [--model <brand>/<model>] [-i|--interface <interface>] <target-snap> [<context snap>...]
 
 auto-connections using the input from the corresponding snap directories (see fetch) does two things:
 
@@ -71,6 +71,9 @@ The output report has two corresponding parts:
   other-snap:plug < target-snap-slot
   other-snap:slot > target-snap-plug
   : target-snap-plug    for any plug that is still left unconnected
+
+  this part can be filtered to only show connections and plugs for a given
+  interface using -i|--interface <interface>
 
 NOTE: this will need to produce more output optionally to help debug situations
 where an expected auto-connection is not established
