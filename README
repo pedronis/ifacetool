@@ -83,6 +83,22 @@ constraints in the rules.
 
 --classic requests to simulate the behavior as on a classic system, the default is an Ubuntu Core system.
 
+Changelog
+==========
+
+0.5
+----
+
+ * support filtering by interface with -i|--interface
+ * support --classic
+
+0.4
+----
+
+ * refined auto-connections output
+ * fetch now supports taking metadata from local .snap/.yaml files
+ * clarify license
+
 Ideas
 ======
 review-tools at tag for snap.yaml
