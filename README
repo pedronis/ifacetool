@@ -95,7 +95,13 @@ Changelog
 
 0.6
 ---
+
  * support --candidates for further debugging
+
+0.5.1
+------
+
+ * switch to craft-store 2.3.0 to enable final snapcraft v7 exported auth
 
 0.5
 ----
