@@ -5,6 +5,6 @@ go 1.13
 // replace github.com/snapcore/snapd => ../../snapcore/snapd
 
 require (
-	github.com/snapcore/snapd v0.0.0-20221014092548-859152259ec5
+	github.com/snapcore/snapd v0.0.0-20221017190519-84b525ef05e9
 	gopkg.in/tomb.v2 v2.0.0-20161208151619-d5d1b5820637
 )

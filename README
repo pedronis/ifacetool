@@ -97,6 +97,7 @@ Changelog
 ---
 
  * support --candidates for further debugging
+ * based/for snapd 2.57.5
 
 0.5.1
 ------
