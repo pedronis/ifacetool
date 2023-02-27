@@ -51,6 +51,8 @@ github.com/snapcore/secboot v0.0.0-20220905094328-6a625ee231d3 h1:58BNTUsb16y89b
 github.com/snapcore/secboot v0.0.0-20220905094328-6a625ee231d3/go.mod h1:72paVOkm4sJugXt+v9ItmnjXgO921D8xqsbH2OekouY=
 github.com/snapcore/secboot v0.0.0-20220922155412-5d2b29ff0ee2 h1:sPC5tmNoJ6H8Pu9OHZiYP1YIAlG98Nm44CYS9nliPz0=
 github.com/snapcore/secboot v0.0.0-20220922155412-5d2b29ff0ee2/go.mod h1:72paVOkm4sJugXt+v9ItmnjXgO921D8xqsbH2OekouY=
+github.com/snapcore/secboot v0.0.0-20230119174011-57239c9f324a h1:MwEn6ADhO9DYtqRnat71TOYxcNxBVUeqfDCBtrYcu7Y=
+github.com/snapcore/secboot v0.0.0-20230119174011-57239c9f324a/go.mod h1:72paVOkm4sJugXt+v9ItmnjXgO921D8xqsbH2OekouY=
 github.com/snapcore/snapd v0.0.0-20201005140838-501d14ac146e/go.mod h1:3xrn7QDDKymcE5VO2rgWEQ5ZAUGb9htfwlXnoel6Io8=
 github.com/snapcore/snapd v0.0.0-20220902153805-9dee6cb3b70c h1:sGuhI27SII0Ymnw6/Q8kwLwsjC6zlaAHNQGfE4hmGFY=
 github.com/snapcore/snapd v0.0.0-20220902153805-9dee6cb3b70c/go.mod h1:VJhUlHqGMBnSPFEKbJo2bTkiGjNvwF3nXRueCjgW05k=
@@ -60,6 +62,8 @@ github.com/snapcore/snapd v0.0.0-20221014092548-859152259ec5 h1:2pKxp12IKHoaSIQI
 github.com/snapcore/snapd v0.0.0-20221014092548-859152259ec5/go.mod h1:z1Psd3XEJr9cFekvAH7giuUmnP1Wns/8GmuxCbj45KU=
 github.com/snapcore/snapd v0.0.0-20221017190519-84b525ef05e9 h1:qskdNyX5XqNugvBQHUNzMe9PXOSuPG1gE6gpeZCLPuY=
 github.com/snapcore/snapd v0.0.0-20221017190519-84b525ef05e9/go.mod h1:z1Psd3XEJr9cFekvAH7giuUmnP1Wns/8GmuxCbj45KU=
+github.com/snapcore/snapd v0.0.0-20230222144108-6c067a778203 h1:Om1pzqtDdmJMMjA0dL+Rij2OLstKKW+maj1XLs6NYA8=
+github.com/snapcore/snapd v0.0.0-20230222144108-6c067a778203/go.mod h1:6f8/YFmYLQ3H4ySp21aAZ/LMlps3De9xPwCI3KfDr9k=
 go.mozilla.org/pkcs7 v0.0.0-20200128120323-432b2356ecb1 h1:A/5uWzF44DlIgdm/PQFwfMkW0JX+cIcQi/SwLAmZP5M=
 go.mozilla.org/pkcs7 v0.0.0-20200128120323-432b2356ecb1/go.mod h1:SNgMg+EgDFwmvSmLRTNKC5fegJjB7v23qTQ0XLGUNHk=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
