@@ -32,7 +32,7 @@ parts:
     plugin: nil
     source: .
     build-snaps:
-      - go/1.13/stable
+      - go/1.18/stable
     override-build: |
       go build -o ifacetool-engine ./engine
       mkdir $SNAPCRAFT_PART_INSTALL/bin
