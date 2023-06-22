@@ -9,7 +9,7 @@ description: |
   metadata and snap-declaration content.
 license: GPL-3.0
 base: core20
-grade: devel
+grade: stable
 confinement: strict
 adopt-info: ifacetool
 

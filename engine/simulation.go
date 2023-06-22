@@ -1,7 +1,7 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 
 /*
- * Copyright (C) 2022 Canonical Ltd
+ * Copyright (C) 2022-2023 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as
@@ -103,7 +103,7 @@ func (am *assertsMock) mockSnapDecl(publisher string, extraHeaders map[string]in
 	_, err := am.db.Find(asserts.AccountType, map[string]string{
 		"account-id": publisher,
 	})
-	if asserts.IsNotFound(err) {
+	if errors.Is(err, &asserts.NotFoundError{}) {
 		acct := assertstest.NewAccount(am.storeSigning, publisher, map[string]interface{}{
 			"account-id": publisher,
 		}, "")
@@ -274,7 +274,7 @@ func (s *oneshotSimulation) mockSnap(yamlText string) (*snap.Info, *asserts.Snap
 		decl = a[0].(*asserts.SnapDeclaration)
 		snapInfo.SnapID = decl.SnapID()
 		sideInfo.SnapID = decl.SnapID()
-	} else if asserts.IsNotFound(err) {
+	} else if errors.Is(err, &asserts.NotFoundError{}) {
 		err = nil
 	}
 	noerror(err)
