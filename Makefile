@@ -20,6 +20,7 @@ stylelint:
 
 get-snapd:
 	go get github.com/snapcore/snapd@$(SNAPD_VERSION)
+	go mod tidy
 
 local-replace-on:
 	sed -i -e 's#^// replace#replace#' go.mod
@@ -38,5 +39,6 @@ ifacetool_$(VERSION)-$(SNAPD_VERSION)_amd64.snap:
 clean:
 	rm -f ifacetool-engine
 	rm -f *.snap
+	rm -rf temp
 
 .PHONY: stylelint get-snapd local-replace-off local-replace-on clean clean-envs
