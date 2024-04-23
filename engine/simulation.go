@@ -285,7 +285,7 @@ func (s *oneshotSimulation) mockSnap(yamlText string) (*snap.Info, *asserts.Snap
 	// Put a side info into the state
 	snapstate.Set(s.state, snapInfo.InstanceName(), &snapstate.SnapState{
 		Active:      true,
-		Sequence:    []*snap.SideInfo{sideInfo},
+		Sequence:    snapstatetest.NewSequenceFromSnapSideInfos([]*snap.SideInfo{sideInfo}),
 		Current:     sideInfo.Revision,
 		SnapType:    string(snapInfo.Type()),
 		InstanceKey: snapInfo.InstanceKey,
