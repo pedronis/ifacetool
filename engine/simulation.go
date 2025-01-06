@@ -1,7 +1,7 @@
 // -*- Mode: Go; indent-tabs-mode: t -*-
 
 /*
- * Copyright (C) 2022-2023 Canonical Ltd
+ * Copyright (C) 2022-2025 Canonical Ltd
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 3 as
@@ -486,8 +486,12 @@ func (s *oneshotSimulation) simulateAutoConnect(params *autoConnectSimulation) e
 		}
 
 		inst := checkInstall(modelAs, snapInfo, snapDecl)
+		snapAppSet, err := interfaces.NewSnapAppSet(snapInfo, nil)
+		if err != nil {
+			return fmt.Errorf("processing snap %s: %v", name, err)
+		}
 
-		err = mgr.Repository().AddSnap(snapInfo)
+		err = mgr.Repository().AddAppSet(snapAppSet)
 		if err != nil {
 			return fmt.Errorf("processing snap %s: %v", snapInfo.SnapName(), err)
 		}
