@@ -8,7 +8,7 @@ description: |
   do in terms of auto-connections for a group of snaps given snap
   metadata and snap-declaration content.
 license: GPL-3.0
-base: core20
+base: core22
 grade: stable
 confinement: strict
 adopt-info: ifacetool

@@ -93,6 +93,13 @@ constraints in the rules.
 Changelog
 ==========
 
+0.6.5
+------
+
+ * check snap name
+ * switch to core22 as base
+ * some other modernizing for development
+
 0.6
 ---
 

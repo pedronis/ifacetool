@@ -39,6 +39,8 @@ class Fetcher:
         )
 
     def snap_ids(self, name):
+        if "." in name or "/" in name:
+            raise Exception(f"invalid snap name: {name}")
         info_fn = f"{name}/.snap.json"
         if os.path.isfile(info_fn):
             with open(info_fn) as info_f:
