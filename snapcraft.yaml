@@ -26,7 +26,7 @@ parts:
       - squashfs-tools
     override-pull: |
       snapcraftctl pull
-      snapcraftctl set-version "$(cat VERSION)-$(cat SNAPD_VERSION)"
+      snapcraftctl set-version "$(cat VERSION)-snapd$(cat SNAPD_VERSION)"
 
   engine:
     plugin: nil

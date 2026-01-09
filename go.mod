@@ -5,7 +5,7 @@ go 1.18
 // replace github.com/snapcore/snapd => ../../snapcore/snapd
 
 require (
-	github.com/snapcore/snapd v0.0.0-20250919080913-65b234d0d23c
+	github.com/snapcore/snapd v0.0.0-20251127045958-9c1b144b8d37
 	gopkg.in/tomb.v2 v2.0.0-20161208151619-d5d1b5820637
 )
 
@@ -27,7 +27,7 @@ require (
 	github.com/mvo5/goconfigparser v0.0.0-20231016112547-05bd887f05e1 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/snapcore/go-gettext v0.0.0-20191107141714-82bbea49e785 // indirect
-	github.com/snapcore/secboot v0.0.0-20250723142039-3e181c8edf0f // indirect
+	github.com/snapcore/secboot v0.0.0-20251111162531-4195ff774f3a // indirect
 	go.etcd.io/bbolt v1.3.9 // indirect
 	golang.org/x/crypto v0.23.0 // indirect
 	golang.org/x/exp v0.0.0-20240416160154-fe59bbe5cc7f // indirect

@@ -33,7 +33,7 @@ local-replace-off:
 ifacetool-engine:
 	go build -o ifacetool-engine ./engine
 
-ifacetool_$(VERSION)-$(SNAPD_VERSION)_amd64.snap:
+ifacetool_$(VERSION)-snapd$(SNAPD_VERSION)_amd64.snap:
 	snapcraft snap
 
 clean:

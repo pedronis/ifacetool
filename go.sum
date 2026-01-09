@@ -45,10 +45,10 @@ github.com/rogpeppe/clock v0.0.0-20190514195947-2896927a307a h1:3QH7VyOaaiUHNrA9
 github.com/rogpeppe/clock v0.0.0-20190514195947-2896927a307a/go.mod h1:4r5QyqhjIWCcK8DO4KMclc5Iknq5qVBAlbYYzAbUScQ=
 github.com/snapcore/go-gettext v0.0.0-20191107141714-82bbea49e785 h1:PaunR+BhraKSLxt2awQ42zofkP+NKh/VjQ0PjIMk/y4=
 github.com/snapcore/go-gettext v0.0.0-20191107141714-82bbea49e785/go.mod h1:D3SsWAXK7wCCBZu+Vk5hc1EuKj/L3XN1puEMXTU4LrQ=
-github.com/snapcore/secboot v0.0.0-20250723142039-3e181c8edf0f h1:9fDxDbmLSfDTk3T9pAdHqmP/cm5s8brua3OnIbG8d9Y=
-github.com/snapcore/secboot v0.0.0-20250723142039-3e181c8edf0f/go.mod h1:YOJQnKKG5YXotxAebtzIJrnDiDAMirAbVTRj7IkGa7U=
-github.com/snapcore/snapd v0.0.0-20250919080913-65b234d0d23c h1:Aixg8r4OI1WY/nzod7w5Z8joBXUF0eDdf1KKMUVyOo8=
-github.com/snapcore/snapd v0.0.0-20250919080913-65b234d0d23c/go.mod h1:z8KQXflnXuM2z1Xi7uJ9PJ+QEE3kxEapNK8jNN71fXI=
+github.com/snapcore/secboot v0.0.0-20251111162531-4195ff774f3a h1:Ec5vJ3zAkKq5V142ROcDA3jzq8Va6BHeT9EEyfmZuhA=
+github.com/snapcore/secboot v0.0.0-20251111162531-4195ff774f3a/go.mod h1:AsL+WlYNWHauN7SGfjeYh/5gzf7tWWMka4fUsXvyp4E=
+github.com/snapcore/snapd v0.0.0-20251127045958-9c1b144b8d37 h1:rZrpDdnrTRIBMb84nIPjCnpPB6rvR2bB//BLAFlaAh8=
+github.com/snapcore/snapd v0.0.0-20251127045958-9c1b144b8d37/go.mod h1:70TvQCoZfjwZPBNXDNn2MGHAC0H04GylktpLkL7KNHE=
 github.com/stretchr/testify v1.8.1 h1:w7B6lhMri9wdJUVmEZPGGhZzrYTPvgJArz7wNPgYKsk=
 go.etcd.io/bbolt v1.3.9 h1:8x7aARPEXiXbHmtUwAIv7eV2fQFHrLLavdiJ3uzJXoI=
 go.etcd.io/bbolt v1.3.9/go.mod h1:zaO32+Ti0PK1ivdPtgMESzuzL2VPoIG1PCQNvOdo/dE=
