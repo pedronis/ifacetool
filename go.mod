@@ -5,14 +5,14 @@ go 1.18
 // replace github.com/snapcore/snapd => ../../snapcore/snapd
 
 require (
-	github.com/snapcore/snapd v0.0.0-20251127045958-9c1b144b8d37
+	github.com/snapcore/snapd v0.0.0-20260213081307-0ea25ad8f14e
 	gopkg.in/tomb.v2 v2.0.0-20161208151619-d5d1b5820637
 )
 
 require (
 	github.com/bmatcuk/doublestar/v4 v4.6.1 // indirect
 	github.com/canonical/cpuid v0.0.0-20220614022739-219e067757cb // indirect
-	github.com/canonical/go-efilib v1.6.0 // indirect
+	github.com/canonical/go-efilib v1.7.0 // indirect
 	github.com/canonical/go-kbkdf v0.0.0-20250104172618-3b1308f9acf9 // indirect
 	github.com/canonical/go-password-validator v0.0.0-20250617132709-1b205303ca54 // indirect
 	github.com/canonical/go-sp800.90a-drbg v0.0.0-20210314144037-6eeb1040d6c3 // indirect
@@ -21,13 +21,15 @@ require (
 	github.com/coreos/go-systemd v0.0.0-20191104093116-d3cd4ed1dbcf // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/juju/ratelimit v1.0.1 // indirect
-	github.com/kr/pretty v0.2.2-0.20200810074440-814ac30b4b18 // indirect
-	github.com/kr/text v0.1.0 // indirect
+	github.com/kr/pretty v0.3.0 // indirect
+	github.com/kr/text v0.2.0 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/mvo5/goconfigparser v0.0.0-20231016112547-05bd887f05e1 // indirect
+	github.com/pilebones/go-udev v0.9.0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
+	github.com/rogpeppe/go-internal v1.6.1 // indirect
 	github.com/snapcore/go-gettext v0.0.0-20191107141714-82bbea49e785 // indirect
-	github.com/snapcore/secboot v0.0.0-20251111162531-4195ff774f3a // indirect
+	github.com/snapcore/secboot v0.0.0-20260129175210-e638825ef829 // indirect
 	go.etcd.io/bbolt v1.3.9 // indirect
 	golang.org/x/crypto v0.23.0 // indirect
 	golang.org/x/exp v0.0.0-20240416160154-fe59bbe5cc7f // indirect
