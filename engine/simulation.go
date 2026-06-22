@@ -231,7 +231,7 @@ func (s *oneshotSimulation) manager() *ifacestate.InterfaceManager {
 		noerror(fmt.Errorf("internal error: interface manager already initialized"))
 	}
 	s.hookMgr = s.hookManager()
-	mgr, err := ifacestate.Manager(s.state, s.hookMgr, s.o.TaskRunner(), nil, nil)
+	mgr, err := ifacestate.Manager(s.state, s.hookMgr, nil, s.o.TaskRunner(), nil, nil)
 	noerror(err)
 	addForeignTaskHandlers(s.o.TaskRunner())
 	mgr.DisableUDevMonitor()

@@ -93,6 +93,11 @@ constraints in the rules.
 Changelog
 ==========
 
+0.6.6
+------
+
+* fixes for snapd 2.76+
+
 0.6.5
 ------
 
