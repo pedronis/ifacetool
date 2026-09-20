@@ -72,8 +72,9 @@ func (am *assertsMock) setupAsserts(st *state.State) {
 	am.storeSigning = assertstest.NewStoreStack("canonical", nil)
 
 	db, err := asserts.OpenDatabase(&asserts.DatabaseConfig{
-		Backstore: asserts.NewMemoryBackstore(),
-		Trusted:   am.storeSigning.Trusted,
+		Backstore:       asserts.NewMemoryBackstore(),
+		Trusted:         am.storeSigning.Trusted,
+		OtherPredefined: []asserts.Assertion{asserts.BuiltinBaseDeclaration()},
 	})
 	noerror(err)
 	am.db = db

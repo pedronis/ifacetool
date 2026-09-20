@@ -122,6 +122,11 @@ constraints in the rules.
 Changelog
 ==========
 
+0.6.7
+------
+
+* use snapd 2.77.1 and fixes for it
+
 0.6.6
 ------
 
