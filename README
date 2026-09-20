@@ -17,6 +17,35 @@ available by:
  * snap connect ifacetool:password-manager-service OR
  * setting SNAPCRAFT_STORE_CREDENTIALS as per https://forum.snapcraft.io/t/snapcraft-authentication-options
 
+Snapd candidate updates
+=======================
+
+The Update snapd candidate GitHub Actions workflow checks the snapd candidate
+channel every Monday and Thursday and can also be run manually. When the
+candidate differs from SNAPD_VERSION, it updates the Go dependencies, builds
+and installs the snap, and compares the output of minimal-test with
+testdata/minimal-test.expected before opening a pull request.
+
+After that pull request is reviewed and merged, the workflow tags the merged
+commit and dispatches the Build and Publish ifacetool workflow for the tag.
+That run pauses for a deployment approval before it uploads to the store.
+
+The setup this expects:
+
+ * GitHub Actions is allowed to create pull requests
+
+ * SNAPCRAFT_RO_STORE_CREDENTIALS is set as a repository secret, exported
+   with --acls package_access, and is used by the smoke test to run
+   minimal-test
+
+ * a "publish" environment exists with required reviewers, is limited to
+   tags matching [0-9]*.[0-9]*.[0-9]*-snapd*, and holds
+   SNAPCRAFT_STORE_CREDENTIALS as an environment secret, exported with
+   --acls package_access,package_push,package_release and --channels edge
+
+SNAPCRAFT_STORE_CREDENTIALS must not also exist as a repository secret,
+otherwise every job can read it and the environment gates nothing.
+
 Commands
 =========
 

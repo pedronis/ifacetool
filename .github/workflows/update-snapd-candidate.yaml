@@ -1,0 +1,219 @@
+name: Update snapd candidate
+
+on:
+  schedule:
+    - cron: '0 6 * * 1,4'
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+jobs:
+  update:
+    name: Test snapd candidate and create PR
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    concurrency:
+      group: update-snapd-candidate
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: main
+          persist-credentials: false
+
+      - name: Compare snapd versions
+        id: versions
+        run: |
+          candidate=$(bash scripts/snapd-candidate-version.sh)
+          current=$(tr -d '[:space:]' < SNAPD_VERSION)
+
+          if [[ ! "$current" =~ ^[0-9]+(\.[0-9]+)*$ ]]; then
+            echo "invalid SNAPD_VERSION: $current" >&2
+            exit 1
+          fi
+
+          echo "candidate=$candidate" >> "$GITHUB_OUTPUT"
+          echo "current=$current" >> "$GITHUB_OUTPUT"
+          if [[ "$candidate" == "$current" ]]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "snapd candidate is already $candidate; nothing to update." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "snapd candidate changed from $current to $candidate." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Update snapd dependency
+        if: steps.versions.outputs.changed == 'true'
+        env:
+          CANDIDATE_VERSION: ${{ steps.versions.outputs.candidate }}
+        run: |
+          printf '%s\n' "$CANDIDATE_VERSION" > SNAPD_VERSION
+          make get-snapd
+
+      - name: Verify generated changes
+        if: steps.versions.outputs.changed == 'true'
+        run: |
+          found_version=false
+          while IFS= read -r status_line; do
+            file=${status_line:3}
+            case "$file" in
+              SNAPD_VERSION)
+                found_version=true
+                ;;
+              go.mod|go.sum)
+                ;;
+              *)
+                echo "unexpected generated change: $file" >&2
+                exit 1
+                ;;
+            esac
+          done < <(git status --porcelain=v1)
+
+          if [[ "$found_version" != true ]]; then
+            echo "SNAPD_VERSION was not updated" >&2
+            exit 1
+          fi
+
+      - name: Build snap
+        if: steps.versions.outputs.changed == 'true'
+        uses: snapcore/action-build@3bdaa03e1ba6bf59a65f84a751d943d549a54e79 # v1.3.0
+        id: snapcraft
+
+      - name: Test installed snap
+        if: steps.versions.outputs.changed == 'true'
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_RO_STORE_CREDENTIALS }}
+          SNAP_PATH: ${{ steps.snapcraft.outputs.snap }}
+        run: |
+          if [[ -z "$SNAPCRAFT_STORE_CREDENTIALS" ]]; then
+            echo "SNAPCRAFT_RO_STORE_CREDENTIALS is required for the smoke test" >&2
+            exit 1
+          fi
+          bash scripts/test-installed-snap.sh "$SNAP_PATH"
+
+      - name: Create pull request
+        if: steps.versions.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7.0.11
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: main
+          branch: automation/update-snapd-candidate
+          delete-branch: true
+          add-paths: |
+            SNAPD_VERSION
+            go.mod
+            go.sum
+          commit-message: use snapd ${{ steps.versions.outputs.candidate }}
+          title: Use snapd ${{ steps.versions.outputs.candidate }}
+          body: |
+            <!-- update-snapd-candidate -->
+            Update snapd from `${{ steps.versions.outputs.current }}` to `${{ steps.versions.outputs.candidate }}`.
+
+            The candidate dependency was resolved with `make get-snapd`, the snap built successfully, and the installed snap passed `minimal-test` against the committed expected output.
+
+  finalize:
+    name: Tag merged snapd update
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.head.ref == 'automation/update-snapd-candidate' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: write
+      pull-requests: read
+    concurrency:
+      group: finalize-snapd-candidate
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          fetch-depth: 0
+
+      - name: Verify pull request files
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          found_version=false
+          while IFS= read -r file; do
+            case "$file" in
+              SNAPD_VERSION)
+                found_version=true
+                ;;
+              go.mod|go.sum)
+                ;;
+              *)
+                echo "unexpected file in snapd update PR: $file" >&2
+                exit 1
+                ;;
+            esac
+          done < <(gh api --paginate \
+            "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files" \
+            --jq '.[].filename')
+
+          if [[ "$found_version" != true ]]; then
+            echo "snapd update PR did not change SNAPD_VERSION" >&2
+            exit 1
+          fi
+
+      - name: Create version tag
+        id: tag
+        env:
+          TARGET_COMMIT: ${{ github.event.pull_request.merge_commit_sha }}
+        run: |
+          version=$(tr -d '[:space:]' < VERSION)
+          snapd_version=$(tr -d '[:space:]' < SNAPD_VERSION)
+          tag="$version-snapd$snapd_version"
+
+          if [[ ! "$version" =~ ^[0-9]+(\.[0-9]+)*$ ]]; then
+            echo "invalid VERSION: $version" >&2
+            exit 1
+          fi
+          if [[ ! "$snapd_version" =~ ^[0-9]+(\.[0-9]+)*$ ]]; then
+            echo "invalid SNAPD_VERSION: $snapd_version" >&2
+            exit 1
+          fi
+
+          if existing_commit=$(git rev-parse --verify "refs/tags/$tag^{commit}" 2>/dev/null); then
+            if [[ "$existing_commit" != "$TARGET_COMMIT" ]]; then
+              echo "tag $tag already points to $existing_commit, not $TARGET_COMMIT" >&2
+              exit 1
+            fi
+            echo "tag $tag already points to $TARGET_COMMIT" >> "$GITHUB_STEP_SUMMARY"
+          else
+            git config user.name github-actions[bot]
+            git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+            git tag -a "$tag" "$TARGET_COMMIT" -m "use snapd $snapd_version"
+            git push origin "refs/tags/$tag"
+            echo "created tag $tag on $TARGET_COMMIT" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          echo "name=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Dispatch build and publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.tag.outputs.name }}
+          TARGET_COMMIT: ${{ github.event.pull_request.merge_commit_sha }}
+        run: |
+          run_count=$(gh api --method GET \
+            "repos/$GITHUB_REPOSITORY/actions/workflows/build-and-publish.yaml/runs" \
+            -f event=workflow_dispatch \
+            -f head_sha="$TARGET_COMMIT" \
+            -f per_page=1 \
+            --jq '.total_count')
+          if [[ "$run_count" -eq 0 ]]; then
+            gh workflow run build-and-publish.yaml --ref "$TAG"
+            echo "dispatched build-and-publish.yaml at $TAG" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "build-and-publish.yaml was already dispatched for $TARGET_COMMIT" >> "$GITHUB_STEP_SUMMARY"
+          fi

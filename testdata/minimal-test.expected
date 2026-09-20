@@ -1,0 +1,46 @@
+installing gtk-common-themes: OK
+installing firefox: OK
+gtk-common-themes:gtk-3-themes > gtk-3-themes
+gtk-common-themes:icon-themes > icon-themes
+gtk-common-themes:sound-themes > sound-themes
+snapd:audio-playback > audio-playback
+snapd:audio-record > audio-record
+snapd:avahi-observe > avahi-observe
+snapd:browser-support > browser-sandbox
+snapd:camera > camera
+snapd:desktop > desktop
+snapd:desktop-legacy > desktop-legacy
+snapd:gsettings > gsettings
+snapd:hardware-observe > hardware-observe
+snapd:home > home-read-all
+snapd:joystick > joystick
+snapd:kerberos-tickets > kerberos-tickets
+snapd:login-session-observe > login-session-observe
+snapd:mount-control > host-hunspell
+snapd:network > network
+snapd:network-bind > network-bind
+snapd:opengl > opengl
+snapd:personal-files > dot-mozilla-firefox
+snapd:removable-media > removable-media
+snapd:screen-inhibit-control > screen-inhibit-control
+snapd:system-files > etc-firefox
+snapd:system-files > host-usr-share-hunspell
+snapd:system-packages-doc > system-packages-doc
+snapd:timezone-control > timezone-control
+snapd:u2f-devices > u2f-devices
+snapd:unity7 > unity7
+snapd:upower-observe > upower-observe
+snapd:wayland > wayland
+snapd:x11 > x11
+: alsa
+: cups-control
+: gnome-46-2404
+: gpu-2404
+: network-observe
+: password-manager-service
+: pcscd
+installing firefox: OK
+installing gtk-common-themes: OK
+firefox:gtk-3-themes < gtk-3-themes
+firefox:icon-themes < icon-themes
+firefox:sound-themes < sound-themes

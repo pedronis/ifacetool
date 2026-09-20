@@ -4,46 +4,54 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - '0.6.5-*'
+      - '[0-9]*.[0-9]*.[0-9]*-snapd*'
+
+permissions:
+  contents: read
 
 jobs:
   build-and-publish:
     name: Build and publish snap
     runs-on: ubuntu-latest
+    environment: publish
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Verify tag belongs to the default branch
         if: github.event_name == 'push'
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
-          default_branch="${{ github.event.repository.default_branch }}"
-          git fetch origin "$default_branch:refs/remotes/origin/$default_branch"
-          git merge-base --is-ancestor "${GITHUB_SHA}^{commit}" "origin/$default_branch"
+          git fetch origin "$DEFAULT_BRANCH:refs/remotes/origin/$DEFAULT_BRANCH"
+          git merge-base --is-ancestor "${GITHUB_SHA}^{commit}" "origin/$DEFAULT_BRANCH"
 
       - name: Decide whether to publish
         id: publish_decision
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
         run: |
-          if [[ -n "${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}" ]]; then
+          if [[ -n "$SNAPCRAFT_STORE_CREDENTIALS" ]]; then
             echo "publish=true" >> "$GITHUB_OUTPUT"
           else
             echo "publish=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Build snap
-        uses: snapcore/action-build@v1
+        uses: snapcore/action-build@3bdaa03e1ba6bf59a65f84a751d943d549a54e79 # v1.3.0
         id: snapcraft
 
       - name: Upload snap artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: snap
           path: ${{ steps.snapcraft.outputs.snap }}
 
       - name: Publish snap to edge
         if: steps.publish_decision.outputs.publish == 'true'
-        uses: canonical/action-publish@v1
+        uses: canonical/action-publish@214b86e5ca036ead1668c79afb81e550e6c54d40 # v1.2.0
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
         with:
