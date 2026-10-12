@@ -51,10 +51,10 @@ github.com/rogpeppe/clock v0.0.0-20190514195947-2896927a307a h1:3QH7VyOaaiUHNrA9
 github.com/rogpeppe/clock v0.0.0-20190514195947-2896927a307a/go.mod h1:4r5QyqhjIWCcK8DO4KMclc5Iknq5qVBAlbYYzAbUScQ=
 github.com/rogpeppe/go-internal v1.6.1 h1:/FiVV8dS/e+YqF2JvO3yXRFbBLTIuSDkuC7aBOAvL+k=
 github.com/rogpeppe/go-internal v1.6.1/go.mod h1:xXDCJY+GAPziupqXw64V24skbSoqbTEfhy4qGm1nDQc=
-github.com/snapcore/secboot v0.0.0-20260623135244-457b03a16d19 h1:nVT7EXqb2qUXWG94woDaS5IrWEy87pgj8esfvVFiZx0=
-github.com/snapcore/secboot v0.0.0-20260623135244-457b03a16d19/go.mod h1:/J5bNHw8HkyxuUZRrk2LUzkne3zO/kEwJlm+/oB16SE=
-github.com/snapcore/snapd v0.0.0-20260903090211-8a77c5017df4 h1:UqcsVS8lbS3ILyVtz+g6rftKjd9XTbH7xOOkmkf4uyc=
-github.com/snapcore/snapd v0.0.0-20260903090211-8a77c5017df4/go.mod h1:ssaB8y6hc7d1Ef3L4q6bm4p+govIt4H5nsNXWRJ3HR4=
+github.com/snapcore/secboot v0.0.0-20260814094831-dd95d855ad64 h1:jZBwQI4+0/dypcKdQk9v5yi5pfKMVvXs/KG2XQlNjyI=
+github.com/snapcore/secboot v0.0.0-20260814094831-dd95d855ad64/go.mod h1:/J5bNHw8HkyxuUZRrk2LUzkne3zO/kEwJlm+/oB16SE=
+github.com/snapcore/snapd v0.0.0-20260907095926-00b63144e44c h1:JDIG0FJSZjtvfyJb8KYXwrD7ch8IuGSKzxOwtv2nuVQ=
+github.com/snapcore/snapd v0.0.0-20260907095926-00b63144e44c/go.mod h1:S5g4xFl/g3criGb6Dtfj6W78nSEq0twblMwXKWuNmFg=
 github.com/stretchr/testify v1.8.1 h1:w7B6lhMri9wdJUVmEZPGGhZzrYTPvgJArz7wNPgYKsk=
 go.etcd.io/bbolt v1.3.9 h1:8x7aARPEXiXbHmtUwAIv7eV2fQFHrLLavdiJ3uzJXoI=
 go.etcd.io/bbolt v1.3.9/go.mod h1:zaO32+Ti0PK1ivdPtgMESzuzL2VPoIG1PCQNvOdo/dE=
